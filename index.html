@@ -1,251 +1,358 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Công Cụ Đóng Dấu & Xóa Logo Ảnh</title>
-    <meta name="description" content="Công cụ trực tuyến miễn phí để đóng dấu ảnh và xóa logo Gemini.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    <title>Gemini Watermark Remover - AI Image Processing</title>
+    <meta name="description" content="Free Gemini watermark remover tool. Safe, private, and 100% browser-based.">
+    <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238B5CF6' stroke-width='2'%3E%3Cpath d='M12 3l-1.9 5.8-5.8 1.9 5.8 1.9 1.9 5.8 1.9-5.8 5.8-1.9-5.8-1.9z'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <style>
         :root {
-            --primary: hsl(250, 100%, 65%);
-            --accent: hsl(320, 100%, 65%);
-            --bg-dark: hsl(230, 25%, 8%);
-            --bg-card: hsl(230, 20%, 12%);
-            --bg-card-hover: hsl(230, 20%, 16%);
-            --bg-input: hsl(230, 20%, 15%);
-            --text-primary: hsl(0, 0%, 95%);
-            --text-secondary: hsl(230, 10%, 65%);
-            --text-muted: hsl(230, 10%, 45%);
-            --border-color: hsl(230, 20%, 20%);
-            --border-light: hsl(230, 20%, 25%);
-            --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            --shadow-glow: 0 0 30px hsla(250, 100%, 65%, 0.3);
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --radius-xl: 24px;
-            --radius-full: 9999px;
-            --space-xs: 0.25rem;
-            --space-sm: 0.5rem;
-            --space-md: 1rem;
-            --space-lg: 1.5rem;
-            --space-xl: 2rem;
-            --space-2xl: 3rem;
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --bg-card-hover: rgba(255, 255, 255, 0.06);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-muted: rgba(255, 255, 255, 0.4);
+            --accent-purple: #8B5CF6;
+            --accent-pink: #EC4899;
+            --accent-blue: #3B82F6;
+            --accent-cyan: #06B6D4;
+            --accent-green: #10B981;
+            --gradient-primary: linear-gradient(135deg, #8B5CF6 0%, #EC4899 50%, #F97316 100%);
+            --gradient-glow: linear-gradient(135deg, rgba(139, 92, 246, 0.4) 0%, rgba(236, 72, 153, 0.4) 100%);
         }
 
-        *,
-        *::before,
-        *::after {
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-dark);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
             color: var(--text-primary);
             min-height: 100vh;
-            line-height: 1.6;
+            overflow-x: hidden;
         }
 
-        body::before {
-            content: '';
+        /* Animated Background */
+        .bg-animation {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            height: 60vh;
-            background: radial-gradient(ellipse at center, hsla(250, 100%, 65%, 0.15) 0%, transparent 70%);
-            pointer-events: none;
+            bottom: 0;
+            z-index: -1;
+            overflow: hidden;
         }
 
-        .app-container {
-            position: relative;
-            z-index: 1;
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.08) 0%, transparent 50%);
+            animation: bgFloat 20s ease-in-out infinite;
+        }
+
+        @keyframes bgFloat {
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            33% {
+                transform: translate(2%, 2%) rotate(1deg);
+            }
+
+            66% {
+                transform: translate(-2%, 1%) rotate(-1deg);
+            }
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: orbFloat 15s ease-in-out infinite;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent-purple);
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 300px;
+            height: 300px;
+            background: var(--accent-pink);
+            top: 60%;
+            right: 10%;
+            animation-delay: -5s;
+        }
+
+        .orb-3 {
+            width: 350px;
+            height: 350px;
+            background: var(--accent-cyan);
+            bottom: 10%;
+            left: 30%;
+            animation-delay: -10s;
+        }
+
+        @keyframes orbFloat {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            50% {
+                transform: translate(30px, -30px) scale(1.1);
+            }
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 1rem 2rem;
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-content {
             max-width: 1400px;
             margin: 0 auto;
-            padding: var(--space-lg);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: var(--space-lg) 0;
-            margin-bottom: var(--space-xl);
-            flex-wrap: wrap;
-            gap: var(--space-lg);
         }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: var(--space-md);
+            gap: 12px;
+            text-decoration: none;
         }
 
         .logo-icon {
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             background: var(--gradient-primary);
-            border-radius: var(--radius-md);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: var(--shadow-glow);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.4);
         }
 
         .logo-icon svg {
-            width: 28px;
-            height: 28px;
+            width: 24px;
+            height: 24px;
             color: white;
         }
 
         .logo-text {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 700;
             background: var(--gradient-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .nav-tabs {
-            display: flex;
-            gap: var(--space-sm);
-            background: var(--bg-card);
-            padding: var(--space-xs);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border-color);
-        }
-
-        .nav-tab {
+        nav {
             display: flex;
             align-items: center;
-            gap: var(--space-sm);
-            padding: var(--space-sm) var(--space-lg);
-            border: none;
-            background: transparent;
+            gap: 1.5rem;
+        }
+
+        nav a {
             color: var(--text-secondary);
-            font-size: 0.95rem;
+            text-decoration: none;
+            font-size: 0.9rem;
             font-weight: 500;
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
         }
 
-        .nav-tab svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        .nav-tab:hover {
+        nav a:hover {
             color: var(--text-primary);
             background: var(--bg-card-hover);
         }
 
-        .nav-tab.active {
-            background: var(--gradient-primary);
-            color: white;
-            box-shadow: var(--shadow-glow);
+        .btn-github {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
         }
 
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.4s ease;
+        .btn-github svg {
+            width: 18px;
+            height: 18px;
         }
 
-        .tab-content.active {
-            display: block;
+        /* Main Content */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 120px 2rem 4rem;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .tab-header {
+        /* Hero Section */
+        .hero {
             text-align: center;
-            margin-bottom: var(--space-2xl);
+            margin-bottom: 4rem;
         }
 
-        .tab-header h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: var(--space-sm);
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 100px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .badge-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(1.2);
+            }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.03em;
+        }
+
+        .hero h1 span {
             background: var(--gradient-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .tab-header p {
-            font-size: 1.1rem;
+        .hero p {
+            font-size: 1.25rem;
             color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            line-height: 1.7;
         }
 
-        .workspace {
-            display: grid;
-            grid-template-columns: 1fr 320px;
-            gap: var(--space-xl);
-            margin-bottom: var(--space-xl);
-        }
-
-        @media (max-width: 900px) {
-            .workspace {
-                grid-template-columns: 1fr;
-            }
+        /* Upload Area */
+        .upload-wrapper {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto 4rem;
         }
 
         .upload-area {
-            padding: var(--space-2xl);
-            border: 2px dashed var(--border-light);
-            border-radius: var(--radius-xl);
+            position: relative;
+            padding: 4rem 2rem;
             background: var(--bg-card);
-            text-align: center;
+            border: 2px dashed var(--border-color);
+            border-radius: 24px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            min-height: 300px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .upload-area::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--gradient-glow);
+            opacity: 0;
+            transition: opacity 0.4s;
         }
 
         .upload-area:hover {
-            border-color: var(--primary);
-            background: var(--bg-card-hover);
-            transform: translateY(-2px);
+            border-color: var(--accent-purple);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(139, 92, 246, 0.2);
+        }
+
+        .upload-area:hover::before {
+            opacity: 1;
         }
 
         .upload-area.dragover {
-            border-color: var(--primary);
-            background: hsla(250, 100%, 65%, 0.1);
-            box-shadow: var(--shadow-glow);
+            border-color: var(--accent-pink);
+            background: rgba(236, 72, 153, 0.1);
+            transform: translateY(-4px) scale(1.01);
+        }
+
+        .upload-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .upload-icon {
             width: 80px;
             height: 80px;
-            margin-bottom: var(--space-lg);
             background: var(--gradient-primary);
-            border-radius: var(--radius-lg);
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 40px rgba(139, 92, 246, 0.3);
             animation: float 3s ease-in-out infinite;
         }
 
@@ -268,198 +375,98 @@
         }
 
         .upload-area h3 {
-            font-size: 1.3rem;
-            margin-bottom: var(--space-xs);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
         }
 
         .upload-area p {
-            color: var(--text-secondary);
-        }
-
-        .settings-panel {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-xl);
-            padding: var(--space-xl);
-            height: fit-content;
-        }
-
-        .settings-panel h3 {
-            font-size: 1.1rem;
-            margin-bottom: var(--space-lg);
-            padding-bottom: var(--space-md);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .setting-group {
-            margin-bottom: var(--space-lg);
-        }
-
-        .setting-group label {
-            display: block;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-bottom: var(--space-sm);
-            font-weight: 500;
-        }
-
-        .setting-group input[type="text"],
-        .setting-group input[type="color"] {
-            width: 100%;
-            padding: var(--space-sm) var(--space-md);
-            background: var(--bg-input);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            color: var(--text-primary);
+            color: var(--text-muted);
             font-size: 0.95rem;
         }
 
-        .setting-group input[type="text"]:focus,
-        .setting-group input[type="color"]:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px hsla(250, 100%, 65%, 0.2);
-        }
-
-        .setting-group input[type="color"] {
-            height: 44px;
-            padding: var(--space-xs);
-            cursor: pointer;
-        }
-
-        .setting-group input[type="range"] {
-            width: 100%;
-            height: 6px;
-            -webkit-appearance: none;
-            background: var(--bg-input);
-            border-radius: var(--radius-full);
-            outline: none;
-            margin-top: var(--space-xs);
-        }
-
-        .setting-group input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
-            background: var(--gradient-primary);
-            border-radius: 50%;
-            cursor: pointer;
-        }
-
-        .range-value {
-            display: inline-block;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-top: var(--space-xs);
-        }
-
-        .toggle-buttons {
+        .upload-formats {
             display: flex;
-            gap: var(--space-xs);
-            background: var(--bg-input);
-            padding: var(--space-xs);
-            border-radius: var(--radius-md);
+            gap: 0.5rem;
+            margin-top: 1.5rem;
         }
 
-        .toggle-btn {
-            flex: 1;
-            padding: var(--space-sm) var(--space-md);
-            border: none;
-            background: transparent;
+        .format-tag {
+            padding: 6px 14px;
+            background: var(--bg-card-hover);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.8rem;
             color: var(--text-secondary);
-            font-size: 0.85rem;
             font-weight: 500;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
         }
 
-        .toggle-btn:hover {
-            color: var(--text-primary);
+        #fileInput {
+            display: none;
         }
 
-        .toggle-btn.active {
-            background: var(--gradient-primary);
-            color: white;
-        }
-
-        .position-grid {
+        /* Steps Section */
+        .steps {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: var(--space-xs);
+            gap: 1.5rem;
+            margin-bottom: 4rem;
         }
 
-        .pos-btn {
-            aspect-ratio: 1;
-            border: none;
-            background: var(--bg-input);
-            color: var(--text-secondary);
-            font-size: 1.2rem;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
+        @media (max-width: 768px) {
+            .steps {
+                grid-template-columns: 1fr;
+            }
         }
 
-        .pos-btn:hover {
-            background: var(--bg-card-hover);
-            color: var(--text-primary);
-        }
-
-        .pos-btn.active {
-            background: var(--gradient-primary);
-            color: white;
-        }
-
-        .mini-upload {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: var(--space-sm);
-            padding: var(--space-lg);
-            background: var(--bg-input);
-            border: 1px dashed var(--border-light);
-            border-radius: var(--radius-md);
-            cursor: pointer;
-        }
-
-        .mini-upload:hover {
-            border-color: var(--primary);
-        }
-
-        .mini-upload svg {
-            width: 32px;
-            height: 32px;
-            color: var(--text-muted);
-        }
-
-        .mini-upload span {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
-
-        .logo-preview {
-            width: 100%;
-            max-height: 100px;
-            object-fit: contain;
-            border-radius: var(--radius-sm);
-            margin-top: var(--space-sm);
-        }
-
-        .setting-group input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            margin-right: var(--space-sm);
-            accent-color: var(--primary);
-            cursor: pointer;
-        }
-
-        .preview-section {
+        .step {
+            position: relative;
+            padding: 2rem;
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: var(--radius-xl);
-            padding: var(--space-xl);
-            animation: slideUp 0.4s ease;
+            border-radius: 20px;
+            transition: all 0.3s;
         }
 
-        @keyframes slideUp {
+        .step:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .step-number {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-primary);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+        }
+
+        .step h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .step p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* Preview Sections */
+        #singlePreview,
+        #multiPreview {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
             from {
                 opacity: 0;
                 transform: translateY(20px);
@@ -471,95 +478,121 @@
             }
         }
 
-        .preview-section h3 {
-            font-size: 1.1rem;
-            margin-bottom: var(--space-lg);
+        .preview-grid {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 2rem;
         }
 
-        .preview-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: var(--bg-input);
-            border-radius: var(--radius-lg);
-            padding: var(--space-lg);
-            min-height: 300px;
+        @media (max-width: 1024px) {
+            .preview-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .preview-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
             overflow: hidden;
         }
 
-        .preview-container canvas {
-            max-width: 100%;
-            max-height: 500px;
-            border-radius: var(--radius-md);
-            box-shadow: 0 4px 20px hsla(0, 0%, 0%, 0.4);
-        }
-
-        .comparison-container {
+        .preview-header {
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: var(--space-lg);
-            flex-wrap: wrap;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .comparison-item {
-            flex: 1;
-            min-width: 250px;
-            text-align: center;
+        .preview-header h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
         }
 
-        .comparison-label {
-            display: inline-block;
-            padding: var(--space-xs) var(--space-md);
-            background: var(--bg-input);
-            border-radius: var(--radius-full);
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-bottom: var(--space-md);
-        }
-
-        .comparison-item canvas {
-            max-width: 100%;
-            max-height: 350px;
-            border-radius: var(--radius-md);
-        }
-
-        .comparison-arrow {
-            width: 48px;
-            height: 48px;
-            background: var(--gradient-primary);
+        .status-dot {
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
+        }
+
+        .status-dot.original {
+            background: #EF4444;
+        }
+
+        .status-dot.processed {
+            background: var(--accent-green);
+        }
+
+        .preview-info {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+
+        .preview-body {
+            height: 400px;
+            padding: 1.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: var(--shadow-glow);
+            background:
+                linear-gradient(45deg, rgba(255, 255, 255, 0.02) 25%, transparent 25%),
+                linear-gradient(-45deg, rgba(255, 255, 255, 0.02) 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, rgba(255, 255, 255, 0.02) 75%),
+                linear-gradient(-45deg, transparent 75%, rgba(255, 255, 255, 0.02) 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
         }
 
-        .comparison-arrow svg {
-            width: 24px;
-            height: 24px;
-            color: white;
+        .preview-body img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
         }
 
-        .action-buttons {
-            display: flex;
-            justify-content: center;
-            gap: var(--space-md);
-            margin-top: var(--space-xl);
-            flex-wrap: wrap;
+        .result-card {
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            box-shadow: 0 0 40px rgba(16, 185, 129, 0.1);
+        }
+
+        /* Control Panel */
+        .control-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 1.5rem;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .control-panel h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .btn {
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: var(--space-sm);
-            padding: var(--space-md) var(--space-xl);
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 1rem;
             border: none;
-            border-radius: var(--radius-lg);
-            font-size: 1rem;
+            border-radius: 14px;
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
+            margin-bottom: 1rem;
         }
 
         .btn svg {
@@ -570,523 +603,751 @@
         .btn-primary {
             background: var(--gradient-primary);
             color: white;
-            box-shadow: var(--shadow-glow);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 0 40px hsla(250, 100%, 65%, 0.4);
+            box-shadow: 0 15px 40px rgba(139, 92, 246, 0.4);
         }
 
         .btn-secondary {
-            background: var(--bg-input);
-            color: var(--text-secondary);
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
             border: 1px solid var(--border-color);
         }
 
         .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        #statusMessage {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-card-hover);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 6rem 0;
+            border-top: 1px solid var(--border-color);
+            margin-top: 4rem;
+        }
+
+        .features-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .features-header h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .features-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .feature-card {
+            padding: 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-icon svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .feature-icon.purple {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(139, 92, 246, 0.1));
+            color: var(--accent-purple);
+        }
+
+        .feature-icon.blue {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.1));
+            color: var(--accent-blue);
+        }
+
+        .feature-icon.green {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.1));
+            color: var(--accent-green);
+        }
+
+        .feature-card h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 2rem;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+
+        .footer-brand h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .footer-brand p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            max-width: 400px;
+        }
+
+        .footer-links h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 3rem auto 0;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Terms Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            width: 95%;
+            max-width: 700px;
+            max-height: 85vh;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            z-index: 201;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--text-secondary);
+        }
+
+        .modal-close:hover {
             background: var(--bg-card-hover);
             color: var(--text-primary);
         }
 
-        .footer {
-            text-align: center;
-            padding: var(--space-xl) 0;
-            margin-top: var(--space-2xl);
-            border-top: 1px solid var(--border-color);
+        .modal-body {
+            padding: 2rem;
+            max-height: calc(85vh - 140px);
+            overflow-y: auto;
         }
 
-        .footer p {
+        .modal-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-body::-webkit-scrollbar-track {
+            background: var(--bg-card);
+        }
+
+        .modal-body::-webkit-scrollbar-thumb {
+            background: var(--accent-purple);
+            border-radius: 10px;
+        }
+
+        .warning-box {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .warning-box h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+            color: #F59E0B;
+            margin-bottom: 1rem;
+        }
+
+        .warning-box p {
+            color: var(--text-secondary);
             font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-card h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-card p {
             color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
         }
 
-        @media (max-width: 768px) {
-            .app-container {
-                padding: var(--space-md);
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .modal-footer .btn {
+            display: inline-flex;
+            width: auto;
+            padding: 0.875rem 2rem;
+        }
+
+        /* Loading Overlay */
+        #loadingOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 10, 15, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 300;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        #loadingOverlay.active {
+            display: flex;
+        }
+
+        .loader {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            animation: loaderPulse 1s ease-in-out infinite;
+            margin-bottom: 1.5rem;
+        }
+
+        @keyframes loaderPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
             }
 
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .nav-tabs {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .nav-tab {
-                flex: 1;
-                justify-content: center;
-                padding: var(--space-sm);
-            }
-
-            .tab-header h1 {
-                font-size: 1.8rem;
-            }
-
-            .comparison-arrow {
-                transform: rotate(90deg);
+            50% {
+                transform: scale(1.2);
+                opacity: 0.7;
             }
         }
 
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+        #loadingOverlay p {
+            color: var(--text-secondary);
+            font-size: 1rem;
         }
 
-        ::-webkit-scrollbar-track {
-            background: var(--bg-dark);
-        }
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            header {
+                padding: 1rem;
+            }
 
-        ::-webkit-scrollbar-thumb {
-            background: var(--border-light);
-            border-radius: var(--radius-full);
+            .logo-text {
+                display: none;
+            }
+
+            nav a:not(.btn-github) {
+                display: none;
+            }
+
+            main {
+                padding: 100px 1rem 2rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .upload-area {
+                padding: 2.5rem 1.5rem;
+            }
+
+            .features-header h2 {
+                font-size: 1.75rem;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="app-container">
-        <header class="header">
-            <div class="logo">
-                <div class="logo-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="18" height="18" rx="2" />
-                        <circle cx="8.5" cy="8.5" r="1.5" />
-                        <path d="M21 15l-5-5L5 21" />
-                    </svg>
-                </div>
-                <span class="logo-text">ImageTool Pro</span>
-            </div>
-            <nav class="nav-tabs">
-                <button class="nav-tab active" data-tab="watermark">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                        <path d="M2 17l10 5 10-5" />
-                        <path d="M2 12l10 5 10-5" />
-                    </svg>
-                    Đóng Dấu Ảnh
-                </button>
-                <button class="nav-tab" data-tab="remove-logo">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10" />
-                        <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
-                    </svg>
-                    Xóa Logo Gemini
-                </button>
-            </nav>
-        </header>
-
-        <main class="main-content">
-            <!-- Watermark Tab -->
-            <section id="watermark-tab" class="tab-content active">
-                <div class="tab-header">
-                    <h1>Đóng Dấu Ảnh</h1>
-                    <p>Thêm watermark văn bản hoặc hình ảnh vào ảnh của bạn</p>
-                </div>
-                <div class="workspace">
-                    <div class="upload-section">
-                        <div class="upload-area" id="watermark-upload-area">
-                            <div class="upload-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                    <polyline points="17 8 12 3 7 8" />
-                                    <line x1="12" y1="3" x2="12" y2="15" />
-                                </svg>
-                            </div>
-                            <h3>Kéo thả ảnh vào đây</h3>
-                            <p>hoặc click để chọn file</p>
-                            <input type="file" id="watermark-input" accept="image/*" hidden>
-                        </div>
-                    </div>
-                    <div class="settings-panel" id="watermark-settings">
-                        <h3>Cài Đặt Watermark</h3>
-                        <div class="setting-group">
-                            <label>Loại Watermark</label>
-                            <div class="toggle-buttons">
-                                <button class="toggle-btn active" data-type="text">Văn bản</button>
-                                <button class="toggle-btn" data-type="image">Hình ảnh</button>
-                            </div>
-                        </div>
-                        <div class="setting-group" id="text-watermark-settings">
-                            <label for="watermark-text">Nội dung</label>
-                            <input type="text" id="watermark-text" placeholder="Nhập watermark..." value="© My Brand">
-                            <label for="watermark-font-size">Cỡ chữ</label>
-                            <input type="range" id="watermark-font-size" min="12" max="120" value="36">
-                            <span class="range-value" id="font-size-value">36px</span>
-                            <label for="watermark-color">Màu sắc</label>
-                            <input type="color" id="watermark-color" value="#ffffff">
-                            <label for="watermark-opacity">Độ trong suốt</label>
-                            <input type="range" id="watermark-opacity" min="0" max="100" value="50">
-                            <span class="range-value" id="opacity-value">50%</span>
-                        </div>
-                        <div class="setting-group" id="image-watermark-settings" style="display: none;">
-                            <label>Ảnh Watermark</label>
-                            <div class="mini-upload" id="watermark-image-upload">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="3" width="18" height="18" rx="2" />
-                                    <circle cx="8.5" cy="8.5" r="1.5" />
-                                    <path d="M21 15l-5-5L5 21" />
-                                </svg>
-                                <span>Chọn ảnh logo</span>
-                                <input type="file" id="watermark-logo-input" accept="image/*" hidden>
-                            </div>
-                            <img id="watermark-logo-preview" class="logo-preview" style="display: none;">
-                            <label for="logo-size">Kích thước</label>
-                            <input type="range" id="logo-size" min="5" max="50" value="20">
-                            <span class="range-value" id="logo-size-value">20%</span>
-                            <label for="logo-opacity">Độ trong suốt</label>
-                            <input type="range" id="logo-opacity" min="0" max="100" value="70">
-                            <span class="range-value" id="logo-opacity-value">70%</span>
-                        </div>
-                        <div class="setting-group">
-                            <label>Vị trí</label>
-                            <div class="position-grid">
-                                <button class="pos-btn" data-pos="top-left">↖</button>
-                                <button class="pos-btn" data-pos="top-center">↑</button>
-                                <button class="pos-btn" data-pos="top-right">↗</button>
-                                <button class="pos-btn" data-pos="middle-left">←</button>
-                                <button class="pos-btn active" data-pos="middle-center">●</button>
-                                <button class="pos-btn" data-pos="middle-right">→</button>
-                                <button class="pos-btn" data-pos="bottom-left">↙</button>
-                                <button class="pos-btn" data-pos="bottom-center">↓</button>
-                                <button class="pos-btn" data-pos="bottom-right">↘</button>
-                            </div>
-                        </div>
-                        <div class="setting-group">
-                            <label><input type="checkbox" id="tile-watermark"> Lặp lại watermark (Tile)</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="preview-section" id="watermark-preview-section" style="display: none;">
-                    <h3>Xem Trước</h3>
-                    <div class="preview-container"><canvas id="watermark-canvas"></canvas></div>
-                    <div class="action-buttons">
-                        <button class="btn btn-secondary" id="clear-watermark">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M3 6h18" />
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
-                                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                            </svg>
-                            Xóa
-                        </button>
-                        <button class="btn btn-primary" id="download-watermark">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                <polyline points="7 10 12 15 17 10" />
-                                <line x1="12" y1="15" x2="12" y2="3" />
-                            </svg>
-                            Tải Xuống
-                        </button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Remove Logo Tab -->
-            <section id="remove-logo-tab" class="tab-content">
-                <div class="tab-header">
-                    <h1>Xóa Logo Gemini</h1>
-                    <p>Tự động phát hiện và xóa logo Gemini khỏi ảnh</p>
-                </div>
-                <div class="workspace">
-                    <div class="upload-section">
-                        <div class="upload-area" id="remove-upload-area">
-                            <div class="upload-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                    <polyline points="17 8 12 3 7 8" />
-                                    <line x1="12" y1="3" x2="12" y2="15" />
-                                </svg>
-                            </div>
-                            <h3>Kéo thả ảnh vào đây</h3>
-                            <p>hoặc click để chọn file</p>
-                            <input type="file" id="remove-input" accept="image/*" hidden>
-                        </div>
-                    </div>
-                    <div class="settings-panel" id="remove-settings">
-                        <h3>Cài Đặt Xóa Logo</h3>
-                        <div class="setting-group">
-                            <label>Vị trí Logo Gemini</label>
-                            <div class="position-grid">
-                                <button class="pos-btn" data-pos="top-left">↖</button>
-                                <button class="pos-btn" data-pos="top-center">↑</button>
-                                <button class="pos-btn" data-pos="top-right">↗</button>
-                                <button class="pos-btn" data-pos="middle-left">←</button>
-                                <button class="pos-btn" data-pos="middle-center">●</button>
-                                <button class="pos-btn" data-pos="middle-right">→</button>
-                                <button class="pos-btn active" data-pos="bottom-left">↙</button>
-                                <button class="pos-btn" data-pos="bottom-center">↓</button>
-                                <button class="pos-btn" data-pos="bottom-right">↘</button>
-                            </div>
-                        </div>
-                        <div class="setting-group">
-                            <label for="crop-size">Kích thước vùng cắt</label>
-                            <input type="range" id="crop-size" min="20" max="200" value="80">
-                            <span class="range-value" id="crop-size-value">80px</span>
-                        </div>
-                        <div class="setting-group">
-                            <label>Phương pháp xóa</label>
-                            <div class="toggle-buttons">
-                                <button class="toggle-btn active" data-method="crop">Cắt bỏ</button>
-                                <button class="toggle-btn" data-method="blur">Làm mờ</button>
-                                <button class="toggle-btn" data-method="fill">Tô màu</button>
-                            </div>
-                        </div>
-                        <div class="setting-group" id="fill-color-group" style="display: none;">
-                            <label for="fill-color">Màu tô</label>
-                            <input type="color" id="fill-color" value="#ffffff">
-                        </div>
-                        <div class="setting-group" id="blur-intensity-group" style="display: none;">
-                            <label for="blur-intensity">Độ mờ</label>
-                            <input type="range" id="blur-intensity" min="5" max="30" value="15">
-                            <span class="range-value" id="blur-intensity-value">15px</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="preview-section" id="remove-preview-section" style="display: none;">
-                    <h3>Kết Quả</h3>
-                    <div class="comparison-container">
-                        <div class="comparison-item">
-                            <span class="comparison-label">Ảnh gốc</span>
-                            <canvas id="original-canvas"></canvas>
-                        </div>
-                        <div class="comparison-arrow">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="5" y1="12" x2="19" y2="12" />
-                                <polyline points="12 5 19 12 12 19" />
-                            </svg>
-                        </div>
-                        <div class="comparison-item">
-                            <span class="comparison-label">Đã xóa logo</span>
-                            <canvas id="result-canvas"></canvas>
-                        </div>
-                    </div>
-                    <div class="action-buttons">
-                        <button class="btn btn-secondary" id="clear-remove">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M3 6h18" />
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
-                                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                            </svg>
-                            Xóa
-                        </button>
-                        <button class="btn btn-primary" id="download-remove">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                <polyline points="7 10 12 15 17 10" />
-                                <line x1="12" y1="15" x2="12" y2="3" />
-                            </svg>
-                            Tải Xuống
-                        </button>
-                    </div>
-                </div>
-            </section>
-        </main>
-        <footer class="footer">
-            <p>© 2026 ImageTool Pro - Công cụ xử lý ảnh trực tuyến miễn phí</p>
-        </footer>
+    <div class="bg-animation">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
     </div>
 
+    <header>
+        <div class="header-content">
+            <a href="./" class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="m12 3-1.9 5.8-5.8 1.9 5.8 1.9 1.9 5.8 1.9-5.8 5.8-1.9-5.8-1.9Z" />
+                    </svg>
+                </div>
+                <span class="logo-text">Gemini Remover</span>
+            </a>
+            <nav>
+                <a href="https://allenkuo.medium.com/removing-gemini-ai-watermarks-a-deep-dive-into-reverse-alpha-blending-bbbd83af2a3f"
+                    target="_blank">How it works</a>
+                <a href="https://github.com/journey-ad/gemini-watermark-remover" target="_blank" class="btn-github">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+                    </svg>
+                    GitHub
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="badge">
+                <span class="badge-dot"></span>
+                100% Browser-based • Private & Secure
+            </div>
+            <h1>Remove <span>Gemini AI</span> Watermarks Instantly</h1>
+            <p>Powered by reverse alpha blending algorithm. No uploads, no servers — your images never leave your
+                device.</p>
+        </section>
+
+        <div class="upload-wrapper">
+            <div id="uploadArea" class="upload-area">
+                <div class="upload-content">
+                    <div class="upload-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="17 8 12 3 7 8" />
+                            <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                    </div>
+                    <h3>Drop your images here</h3>
+                    <p>or click to browse files</p>
+                    <div class="upload-formats">
+                        <span class="format-tag">JPG</span>
+                        <span class="format-tag">PNG</span>
+                        <span class="format-tag">WebP</span>
+                    </div>
+                </div>
+                <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" multiple />
+            </div>
+        </div>
+
+        <section class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h4>Upload Image</h4>
+                <p>Drag and drop or click to select your Gemini AI generated images.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <h4>Auto Process</h4>
+                <p>Our algorithm instantly detects and removes the watermark pattern.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <h4>Download Result</h4>
+                <p>Save your clean, watermark-free image in full quality.</p>
+            </div>
+        </section>
+
+        <!-- Single Image Preview -->
+        <section id="singlePreview">
+            <div class="preview-grid">
+                <div class="preview-column">
+                    <div class="preview-card" style="margin-bottom: 2rem;">
+                        <div class="preview-header">
+                            <h3><span class="status-dot original"></span> Original</h3>
+                            <span id="originalInfo" class="preview-info"></span>
+                        </div>
+                        <div class="preview-body">
+                            <img id="originalImage" data-zoomable />
+                        </div>
+                    </div>
+
+                    <div id="processedSection" class="preview-card result-card" style="display: none;">
+                        <div class="preview-header">
+                            <h3><span class="status-dot processed"></span> Processed</h3>
+                            <span id="processedInfo" class="preview-info"></span>
+                        </div>
+                        <div class="preview-body">
+                            <img id="processedImage" data-zoomable />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-panel">
+                    <h4>Actions</h4>
+                    <button id="downloadBtn" class="btn btn-primary" style="display: none;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                        Download Result
+                    </button>
+                    <button id="resetBtn" class="btn btn-secondary">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                            <path d="M21 3v5h-5" />
+                            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+                            <path d="M8 16H3v5" />
+                        </svg>
+                        Reset / New Image
+                    </button>
+                    <div id="statusMessage"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Multi Image Preview -->
+        <section id="multiPreview">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h3 id="progressText" style="font-size: 1.25rem; font-weight: 600;">Processing: 0/0</h3>
+                <button id="downloadAllBtn" class="btn btn-primary"
+                    style="display: none; width: auto; margin: 0; padding: 0.75rem 1.5rem;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" style="width: 18px; height: 18px;">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    Download All
+                </button>
+            </div>
+            <div id="imageList"></div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features">
+            <div class="features-header">
+                <h2>Why Choose This Tool?</h2>
+                <p>Built with privacy and performance in mind</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon purple">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                        </svg>
+                    </div>
+                    <h4>Lightning Fast</h4>
+                    <p>Process images in milliseconds using modern browser APIs. No waiting, no queues.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon blue">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                    </div>
+                    <h4>100% Private</h4>
+                    <p>All processing happens locally in your browser. Your images never leave your device.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon green">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+                            <line x1="9" y1="9" x2="9.01" y2="9" />
+                            <line x1="15" y1="9" x2="15.01" y2="9" />
+                        </svg>
+                    </div>
+                    <h4>Completely Free</h4>
+                    <p>No limits, no hidden fees, no subscriptions. Use as much as you need.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>Gemini Watermark Remover</h3>
+                <p>A free, open-source tool for removing Gemini AI watermarks. For educational and personal use only.
+                </p>
+            </div>
+            <div class="footer-links">
+                <h4>Links</h4>
+                <ul>
+                    <li><a href="#" id="openTermsBtn">Terms of Use</a></li>
+                    <li><a href="https://github.com/journey-ad/gemini-watermark-remover" target="_blank">GitHub</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="https://allenkuo.medium.com/removing-gemini-ai-watermarks-a-deep-dive-into-reverse-alpha-blending-bbbd83af2a3f"
+                            target="_blank">Technical Article</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© <span id="year">2025</span> Gemini Watermark Remover. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Terms Modal -->
+    <div id="termsOverlay" class="modal-overlay"></div>
+    <div id="termsModal" class="modal">
+        <div class="modal-header">
+            <h2>Terms of Use</h2>
+            <button id="closeTermsBtn" class="modal-close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="warning-box">
+                <h3>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                        <line x1="12" y1="9" x2="12" y2="13" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                    </svg>
+                    Important Disclaimer
+                </h3>
+                <p><strong>This tool is provided for personal and educational use only.</strong> The removal of
+                    watermarks may have legal or ethical implications depending on how you use the resulting images.
+                    Please respect content policies and intellectual property rights.</p>
+            </div>
+
+            <div class="info-card">
+                <h4>Visible Watermarks Only</h4>
+                <p>This tool only removes visible watermarks. It does not affect invisible/steganographic watermarks
+                    (like SynthID) that may be embedded in the image data.</p>
+            </div>
+
+            <div class="info-card">
+                <h4>Privacy Policy</h4>
+                <p>All image processing is done locally in your browser. We do not upload, store, or transmit your
+                    images to any server.</p>
+            </div>
+
+            <div class="info-card">
+                <h4>Limitation of Liability</h4>
+                <p>This tool is provided "as is" without warranty. The developer is not liable for any data loss, image
+                    corruption, or legal disputes arising from use of this tool.</p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button id="agreeTermsBtn" class="btn btn-primary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                </svg>
+                I Understand & Agree
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay">
+        <div class="loader"></div>
+        <p>Processing your image...</p>
+    </div>
+
+    <script src="app.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => { initTabs(); initWatermarkTool(); initRemoveLogoTool(); });
+        // Modal functionality
+        document.addEventListener('DOMContentLoaded', function () {
+            const openTermsBtn = document.getElementById('openTermsBtn');
+            const closeTermsBtn = document.getElementById('closeTermsBtn');
+            const agreeTermsBtn = document.getElementById('agreeTermsBtn');
+            const termsOverlay = document.getElementById('termsOverlay');
+            const termsModal = document.getElementById('termsModal');
 
-        function initTabs() {
-            const tabs = document.querySelectorAll('.nav-tab');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    tabs.forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                    document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
-                });
-            });
-        }
-
-        let watermarkState = { image: null, logoImage: null, type: 'text', text: '© My Brand', fontSize: 36, color: '#ffffff', opacity: 50, logoSize: 20, logoOpacity: 70, position: 'middle-center', tile: false };
-
-        function initWatermarkTool() {
-            const uploadArea = document.getElementById('watermark-upload-area');
-            const fileInput = document.getElementById('watermark-input');
-            uploadArea.addEventListener('click', () => fileInput.click());
-            uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
-            uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
-            uploadArea.addEventListener('drop', e => { e.preventDefault(); uploadArea.classList.remove('dragover'); if (e.dataTransfer.files.length) handleWatermarkFile(e.dataTransfer.files[0]); });
-            fileInput.addEventListener('change', e => { if (e.target.files.length) handleWatermarkFile(e.target.files[0]); });
-
-            document.querySelectorAll('#watermark-settings .toggle-buttons .toggle-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('#watermark-settings .toggle-buttons .toggle-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    watermarkState.type = btn.dataset.type;
-                    document.getElementById('text-watermark-settings').style.display = btn.dataset.type === 'text' ? 'block' : 'none';
-                    document.getElementById('image-watermark-settings').style.display = btn.dataset.type === 'image' ? 'block' : 'none';
-                    if (watermarkState.image) renderWatermark();
-                });
-            });
-
-            document.getElementById('watermark-text').addEventListener('input', e => { watermarkState.text = e.target.value; if (watermarkState.image) renderWatermark(); });
-            document.getElementById('watermark-font-size').addEventListener('input', e => { watermarkState.fontSize = parseInt(e.target.value); document.getElementById('font-size-value').textContent = `${e.target.value}px`; if (watermarkState.image) renderWatermark(); });
-            document.getElementById('watermark-color').addEventListener('input', e => { watermarkState.color = e.target.value; if (watermarkState.image) renderWatermark(); });
-            document.getElementById('watermark-opacity').addEventListener('input', e => { watermarkState.opacity = parseInt(e.target.value); document.getElementById('opacity-value').textContent = `${e.target.value}%`; if (watermarkState.image) renderWatermark(); });
-
-            const logoUpload = document.getElementById('watermark-image-upload');
-            const logoInput = document.getElementById('watermark-logo-input');
-            logoUpload.addEventListener('click', () => logoInput.click());
-            logoInput.addEventListener('change', e => {
-                if (e.target.files.length) {
-                    const reader = new FileReader();
-                    reader.onload = ev => {
-                        const img = new Image();
-                        img.onload = () => { watermarkState.logoImage = img; document.getElementById('watermark-logo-preview').src = ev.target.result; document.getElementById('watermark-logo-preview').style.display = 'block'; if (watermarkState.image) renderWatermark(); };
-                        img.src = ev.target.result;
-                    };
-                    reader.readAsDataURL(e.target.files[0]);
-                }
-            });
-
-            document.getElementById('logo-size').addEventListener('input', e => { watermarkState.logoSize = parseInt(e.target.value); document.getElementById('logo-size-value').textContent = `${e.target.value}%`; if (watermarkState.image) renderWatermark(); });
-            document.getElementById('logo-opacity').addEventListener('input', e => { watermarkState.logoOpacity = parseInt(e.target.value); document.getElementById('logo-opacity-value').textContent = `${e.target.value}%`; if (watermarkState.image) renderWatermark(); });
-
-            document.querySelectorAll('#watermark-settings .position-grid .pos-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('#watermark-settings .position-grid .pos-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    watermarkState.position = btn.dataset.pos;
-                    if (watermarkState.image) renderWatermark();
-                });
-            });
-
-            document.getElementById('tile-watermark').addEventListener('change', e => { watermarkState.tile = e.target.checked; if (watermarkState.image) renderWatermark(); });
-            document.getElementById('clear-watermark').addEventListener('click', () => { watermarkState.image = null; document.getElementById('watermark-preview-section').style.display = 'none'; });
-            document.getElementById('download-watermark').addEventListener('click', () => { const link = document.createElement('a'); link.download = 'watermarked-image.png'; link.href = document.getElementById('watermark-canvas').toDataURL('image/png'); link.click(); });
-        }
-
-        function handleWatermarkFile(file) {
-            const reader = new FileReader();
-            reader.onload = e => {
-                const img = new Image();
-                img.onload = () => { watermarkState.image = img; document.getElementById('watermark-preview-section').style.display = 'block'; renderWatermark(); };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function renderWatermark() {
-            const canvas = document.getElementById('watermark-canvas');
-            const ctx = canvas.getContext('2d');
-            const img = watermarkState.image;
-            canvas.width = img.width; canvas.height = img.height;
-            ctx.drawImage(img, 0, 0);
-
-            if (watermarkState.type === 'text') {
-                ctx.font = `bold ${watermarkState.fontSize}px Inter, sans-serif`;
-                ctx.fillStyle = watermarkState.color;
-                ctx.globalAlpha = watermarkState.opacity / 100;
-                if (watermarkState.tile) {
-                    const tw = ctx.measureText(watermarkState.text).width, gap = 50;
-                    for (let y = watermarkState.fontSize; y < canvas.height; y += watermarkState.fontSize + gap) {
-                        for (let x = 0; x < canvas.width; x += tw + gap) {
-                            ctx.save(); ctx.translate(x, y); ctx.rotate(-Math.PI / 6); ctx.fillText(watermarkState.text, 0, 0); ctx.restore();
-                        }
-                    }
-                } else {
-                    const pos = getPosition(ctx.measureText(watermarkState.text).width, watermarkState.fontSize, canvas.width, canvas.height);
-                    ctx.fillText(watermarkState.text, pos.x, pos.y);
-                }
-            } else if (watermarkState.logoImage) {
-                const lw = (canvas.width * watermarkState.logoSize) / 100, lh = (watermarkState.logoImage.height / watermarkState.logoImage.width) * lw;
-                ctx.globalAlpha = watermarkState.logoOpacity / 100;
-                if (watermarkState.tile) { const gap = 50; for (let y = 0; y < canvas.height; y += lh + gap) for (let x = 0; x < canvas.width; x += lw + gap) ctx.drawImage(watermarkState.logoImage, x, y, lw, lh); }
-                else { const pos = getPosition(lw, lh, canvas.width, canvas.height); ctx.drawImage(watermarkState.logoImage, pos.x, pos.y, lw, lh); }
+            function openModal() {
+                termsOverlay.classList.add('active');
+                termsModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
             }
-            ctx.globalAlpha = 1;
-        }
 
-        function getPosition(w, h, cw, ch) {
-            const p = 20;
-            const positions = { 'top-left': { x: p, y: h + p }, 'top-center': { x: (cw - w) / 2, y: h + p }, 'top-right': { x: cw - w - p, y: h + p }, 'middle-left': { x: p, y: (ch + h) / 2 }, 'middle-center': { x: (cw - w) / 2, y: (ch + h) / 2 }, 'middle-right': { x: cw - w - p, y: (ch + h) / 2 }, 'bottom-left': { x: p, y: ch - p }, 'bottom-center': { x: (cw - w) / 2, y: ch - p }, 'bottom-right': { x: cw - w - p, y: ch - p } };
-            return positions[watermarkState.position] || positions['middle-center'];
-        }
-
-        let removeState = { image: null, position: 'bottom-left', cropSize: 80, method: 'crop', fillColor: '#ffffff', blurIntensity: 15 };
-
-        function initRemoveLogoTool() {
-            const uploadArea = document.getElementById('remove-upload-area');
-            const fileInput = document.getElementById('remove-input');
-            uploadArea.addEventListener('click', () => fileInput.click());
-            uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
-            uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
-            uploadArea.addEventListener('drop', e => { e.preventDefault(); uploadArea.classList.remove('dragover'); if (e.dataTransfer.files.length) handleRemoveFile(e.dataTransfer.files[0]); });
-            fileInput.addEventListener('change', e => { if (e.target.files.length) handleRemoveFile(e.target.files[0]); });
-
-            document.querySelectorAll('#remove-settings .position-grid .pos-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('#remove-settings .position-grid .pos-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    removeState.position = btn.dataset.pos;
-                    if (removeState.image) renderRemove();
-                });
-            });
-
-            document.getElementById('crop-size').addEventListener('input', e => { removeState.cropSize = parseInt(e.target.value); document.getElementById('crop-size-value').textContent = `${e.target.value}px`; if (removeState.image) renderRemove(); });
-
-            document.querySelectorAll('#remove-settings .toggle-buttons .toggle-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('#remove-settings .toggle-buttons .toggle-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    removeState.method = btn.dataset.method;
-                    document.getElementById('fill-color-group').style.display = btn.dataset.method === 'fill' ? 'block' : 'none';
-                    document.getElementById('blur-intensity-group').style.display = btn.dataset.method === 'blur' ? 'block' : 'none';
-                    if (removeState.image) renderRemove();
-                });
-            });
-
-            document.getElementById('fill-color').addEventListener('input', e => { removeState.fillColor = e.target.value; if (removeState.image) renderRemove(); });
-            document.getElementById('blur-intensity').addEventListener('input', e => { removeState.blurIntensity = parseInt(e.target.value); document.getElementById('blur-intensity-value').textContent = `${e.target.value}px`; if (removeState.image) renderRemove(); });
-            document.getElementById('clear-remove').addEventListener('click', () => { removeState.image = null; document.getElementById('remove-preview-section').style.display = 'none'; });
-            document.getElementById('download-remove').addEventListener('click', () => { const link = document.createElement('a'); link.download = 'logo-removed.png'; link.href = document.getElementById('result-canvas').toDataURL('image/png'); link.click(); });
-        }
-
-        function handleRemoveFile(file) {
-            const reader = new FileReader();
-            reader.onload = e => {
-                const img = new Image();
-                img.onload = () => { removeState.image = img; document.getElementById('remove-preview-section').style.display = 'block'; renderRemove(); };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function renderRemove() {
-            const origCanvas = document.getElementById('original-canvas'), resCanvas = document.getElementById('result-canvas');
-            const origCtx = origCanvas.getContext('2d'), resCtx = resCanvas.getContext('2d');
-            const img = removeState.image;
-            origCanvas.width = img.width; origCanvas.height = img.height;
-            resCanvas.width = img.width; resCanvas.height = img.height;
-            origCtx.drawImage(img, 0, 0); resCtx.drawImage(img, 0, 0);
-
-            const size = removeState.cropSize, rect = getLogoRect(img.width, img.height, size);
-            origCtx.strokeStyle = '#ff4444'; origCtx.lineWidth = 3; origCtx.setLineDash([5, 5]); origCtx.strokeRect(rect.x, rect.y, rect.w, rect.h);
-
-            if (removeState.method === 'crop') { resCtx.fillStyle = '#000000'; resCtx.fillRect(rect.x, rect.y, rect.w, rect.h); }
-            else if (removeState.method === 'fill') { resCtx.fillStyle = removeState.fillColor; resCtx.fillRect(rect.x, rect.y, rect.w, rect.h); }
-            else if (removeState.method === 'blur') {
-                const tc = document.createElement('canvas'); tc.width = rect.w; tc.height = rect.h;
-                const tctx = tc.getContext('2d');
-                tctx.drawImage(img, rect.x, rect.y, rect.w, rect.h, 0, 0, rect.w, rect.h);
-                tctx.filter = `blur(${removeState.blurIntensity}px)`; tctx.drawImage(tc, 0, 0);
-                resCtx.drawImage(tc, rect.x, rect.y);
+            function closeModal() {
+                termsOverlay.classList.remove('active');
+                termsModal.classList.remove('active');
+                document.body.style.overflow = '';
             }
-        }
 
-        function getLogoRect(w, h, size) {
-            const p = 10;
-            const positions = { 'top-left': { x: p, y: p }, 'top-center': { x: (w - size) / 2, y: p }, 'top-right': { x: w - size - p, y: p }, 'middle-left': { x: p, y: (h - size) / 2 }, 'middle-center': { x: (w - size) / 2, y: (h - size) / 2 }, 'middle-right': { x: w - size - p, y: (h - size) / 2 }, 'bottom-left': { x: p, y: h - size - p }, 'bottom-center': { x: (w - size) / 2, y: h - size - p }, 'bottom-right': { x: w - size - p, y: h - size - p } };
-            const pos = positions[removeState.position] || positions['bottom-left'];
-            return { x: pos.x, y: pos.y, w: size, h: size };
-        }
+            openTermsBtn.addEventListener('click', e => { e.preventDefault(); openModal(); });
+            closeTermsBtn.addEventListener('click', closeModal);
+            agreeTermsBtn.addEventListener('click', closeModal);
+            termsOverlay.addEventListener('click', closeModal);
+            document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+            document.getElementById('year').textContent = new Date().getFullYear();
+        });
     </script>
 </body>
 
